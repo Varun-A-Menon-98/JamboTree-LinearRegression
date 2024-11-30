@@ -71,7 +71,7 @@ def predict_admission(input_values, model, scaler, feature_names):
         input_array = np.array(input_values).reshape(1, -1)
         input_scaled = scaler.transform(input_array)
         prediction = model.predict(input_scaled)
-        return
+        return prediction
     except Exception as e:
         logger.error(f"Error during prediction: {str(e)}")
         st.error("There was an error during prediction.")
