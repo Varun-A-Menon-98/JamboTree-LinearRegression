@@ -122,10 +122,12 @@ def run_streamlit_app():
 
     # Create sliders for each feature dynamically
     for feature in feature_names:
-        min_value = float(data[feature].min())
-        max_value = float(data[feature].max())
-        step = (max_value - min_value) / 10  # You can adjust the step for better control
-        value = st.slider(feature, min_value, max_value, (min_value + max_value) / 2, step)
+    if feature == "Research":  # Special handling for "Research" feature
+        value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
+        input_values.append(1 if value else 0)
+    else:
+        max_value = float(data[feature].max())  # Get the max value of the feature
+        value = st.slider(feature, 0, int(max_value), (max_value) // 2, step=1)  # Step size of 1
         input_values.append(value)
 
     # Display the prediction when the user presses the button
