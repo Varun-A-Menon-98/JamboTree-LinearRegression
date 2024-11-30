@@ -118,23 +118,25 @@ def run_streamlit_app():
         else:
             try:
                 # Ensure the feature is numeric before using it
+
+        # Check if the feature is numeric
                 if pd.api.types.is_numeric_dtype(data[feature]):
                     max_value = float(data[feature].max())  # Get the max value of the feature
                     min_value = 0  # Start from 0
-                    if max_value > 0:  # Check if the max value is positive
+        
+                    # Handle CGPA with a step of 0.1
+                    if feature == 'CGPA':
                         value = st.number_input(
                             feature, min_value=min_value, max_value=int(max_value), 
-                            value=(int(max_value) // 2), step=1)  # Step size of 1
-                        input_values.append(value)
+                            value=int(max_value) // 2, step=0.1)  # Step size of 0.1 for CGPA
                     else:
-                        st.warning(f"Feature '{feature}' has non-positive max value. Skipping input box.")
-                        input_values.append(0)
-                else:
-                    st.warning(f"Feature '{feature}' is not numeric. Skipping input box.")
-                    input_values.append(0)  # Add a default value for non-numeric features
-            except Exception as e:
-                st.warning(f"Error creating input box for '{feature}': {e}")
-                input_values.append(0)  # Add a default value in case of error
+                        # Handle other numeric features with a step size of 1
+                        value = st.number_input(
+                            feature, min_value=min_value, max_value=int(max_value), 
+                            value=int(max_value) // 2, step=1)  # Step size of 1 for other numeric features
+                    
+                    input_values.append(value)
+            #Add a default value in case of error
 
     # Display the input values for debugging purposes
     # st.write("Input values:", input_values)
