@@ -68,14 +68,17 @@ def preprocess_and_train(data, model_type="Ridge"):
 # Function to make predictions
 def predict_admission(input_values, model, scaler, feature_names):
     try:
+        # Reshaping input values and scaling them for prediction
         input_array = np.array(input_values).reshape(1, -1)
         input_scaled = scaler.transform(input_array)
         prediction = model.predict(input_scaled)
-        return prediction[0]
+        return prediction[0]  # Return the first prediction value (since it's a single value)
     except Exception as e:
+        # Handle any errors that occur during the prediction
         logger.error(f"Error during prediction: {str(e)}")
         st.error("There was an error during prediction.")
-        raise e
+        raise e  # Re-raise the error after logging
+ # This will re-raise the error after logging
 
 # Streamlit UI and Interaction
 def run_streamlit_app():
