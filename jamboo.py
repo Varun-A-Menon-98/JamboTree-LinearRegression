@@ -121,31 +121,30 @@ def run_streamlit_app():
         else:
             try:
                 # Ensure the feature is numeric before using it
-
-        # Check if the feature is numeric
                 if pd.api.types.is_numeric_dtype(data[feature]):
                     max_value = float(data[feature].max())  # Get the max value of the feature
-                    min_value = 0  # Start from 0
+                    min_value = 0.0  # Start from 0.0 (as a float)
         
-                    # Handle CGPA with a step of 0.1
-                    value = st.slider(
-                    feature, min_value=min_value, max_value=10.0, step=0.1
-                    )  # Step size of 0.1 for CGPA
+                    # Handle CGPA with a slider (step 0.1)
+                    if feature == 'CGPA':
+                        value = st.number_input(
+                            feature, min_value=min_value, max_value=max_value, 
+                            value=max_value / 2.0, step=0.1)  # Step size of 0.1 for CGPA
                     else:
                         # Handle other numeric features with a step size of 1
                         value = st.number_input(
-                            feature, min_value=min_value, max_value=int(max_value), 
+                            feature, min_value=int(min_value), max_value=int(max_value),
                             value=int(max_value) // 2, step=1)  # Step size of 1 for other numeric features
                     
                     input_values.append(value)
                 else:
-                # For non-numeric features, you can handle them here or ignore
+                    # For non-numeric features, handle them here or skip
                     st.warning(f"Feature '{feature}' is not numeric. Skipping input box.")
                     input_values.append(0)  # Add a default value for non-numeric features
             except Exception as e:
-            # Catch errors during the creation of the input box
+                # Catch errors during the creation of the input box
                 st.warning(f"Error creating input box for '{feature}': {e}")
-                input_values.append(0) 
+                input_values.append(0)  # Add a default value in case of erro
             #Add a default value in case of error
 
     # Display the input values for debugging purposes
