@@ -130,8 +130,8 @@ def run_streamlit_app():
                     # Handle CGPA with a step of 0.1
                     if feature == 'CGPA':
                         value = st.number_input(
-                            feature, min_value=min_value, max_value=int(max_value), 
-                            value=int(max_value) // 2, step=0.1)  # Step size of 0.1 for CGPA
+                            feature, min_value=min_value, max_value=max_value, 
+                            value=max_value // 2, step=0.1)  # Step size of 0.1 for CGPA
                     else:
                         # Handle other numeric features with a step size of 1
                         value = st.number_input(
