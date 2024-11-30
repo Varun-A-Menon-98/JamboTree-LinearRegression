@@ -121,6 +121,7 @@ def run_streamlit_app():
     input_values = []
 
     # Create sliders for each feature dynamically
+    # Create sliders for each feature dynamically
     for feature in feature_names:
         if feature == "Research":  # Special handling for "Research" feature
             value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
@@ -128,13 +129,21 @@ def run_streamlit_app():
         else:
         # Ensure the feature is numeric before using it
             if pd.api.types.is_numeric_dtype(data[feature]):
-                max_value = float(data[feature].max())  # Get the max value of the feature
-                min_value = 0  # Start from 0
-                value = st.slider(feature, min_value, int(max_value), (max_value) // 2, step=1)  # Step size of 1
-                input_values.append(value)
+                try:
+                    max_value = float(data[feature].max())  # Get the max value of the feature
+                    min_value = 0  # Start from 0
+                    if max_value > 0:  # Check if the max value is positive
+                        value = st.slider(feature, min_value, int(max_value), (int(max_value)) // 2, step=1)  # Step size of 1
+                        input_values.append(value)
+                    else:
+                        st.warning(f"Feature '{feature}' has non-positive max value. Skipping slider.")
+                        input_values.append(0)
+                except Exception as e:
+                    st.warning(f"Error creating slider for '{feature}': {e}")
+                    input_values.append(0)  # Add a default value in case of error
             else:
                 st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
-                input_values.append(0) 
+                input_values.append(0)   
 
     # Display the prediction when the user presses the button
     st.markdown("""
