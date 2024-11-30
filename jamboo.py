@@ -154,17 +154,31 @@ def run_streamlit_app():
     input_array = np.array(input_values).reshape(1, -1)
 
     # Predict when the user presses the button
-    if st.button("Predict Chance of Admit"):
-        try:
-            prediction = predict_admission(input_array, model, scaler, feature_names)
-            prediction_percent = np.clip(prediction * 100, 0, 100)
-            
-            # Display larger font and center text
-            st.markdown(f"<h2 style='text-align: center; font-size: 30px;'>The predicted Chance of Admit is {prediction_percent:.3f}%</h2>", unsafe_allow_html=True)
-            
-            # If prediction is greater than 90, show balloons
-            if prediction_percent > 90:
-                st.balloons()
+    col1, col2, col3 = st.columns([1, 1, 1])
+
+# Column 2 where the button will be placed
+    with col2:
+        with st.container():
+            if st.button("Predict Chance of Admit"):
+                try:
+                    # Assuming input_array, model, scaler, and feature_names are defined elsewhere
+                    prediction = predict_admission(input_array, model, scaler, feature_names)
+                    prediction_percent = np.clip(prediction * 100, 0, 100)
+                    
+                    # Save the result to display later
+                    st.session_state.prediction_result = f"The predicted Chance of Admit is {prediction_percent:.3f}%"
+                    
+                    # If prediction is greater than 90, show balloons
+                    if prediction_percent > 90:
+                        st.balloons()
+
+                except Exception as e:
+                    st.error(f"Prediction failed: {str(e)}")
+
+    # Display the prediction result outside the column to ensure it's centered
+    if 'prediction_result' in st.session_state:
+        st.markdown(f"<h2 style='text-align: center; font-size: 30px;'>{st.session_state.prediction_result}</h2>", unsafe_allow_html=True)
+
 
         except Exception as e:
             st.error(f"Prediction failed: {str(e)}")
