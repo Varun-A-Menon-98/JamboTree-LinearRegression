@@ -2,7 +2,11 @@
 <p align="center">
   <img width="100%" alt="image" src="https://media.licdn.com/dms/image/v2/D5612AQE1XxEXI1JDdQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1691710880639?e=2147483647&v=beta&t=SDtiydTUX3t-5LrHMgrVKZ-zVaddKaG3cSxRRDJhThc">
 </p>
-## 🏷️ Overview
+
+
+## 🏷️Overview
+
+
 The objective of conducting linear regression analysis for Jamboree is to identify the significant factors influencing graduate admissions, such as GRE scores,
  CGPA, and Letters of Recommendation (LOR), while exploring the interrelationships among these features and assessing any multicollinearity issues. By
  developing a predictive model to estimate admission probabilities based on the identified features, we aim to provide prospective students with valuable
