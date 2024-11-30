@@ -126,9 +126,15 @@ def run_streamlit_app():
             value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
             input_values.append(1 if value else 0)
         else:
-            max_value = float(data[feature].max())  # Get the max value of the feature
-            value = st.slider(feature, 0, int(max_value), (max_value) // 2, step=1)  # Step size of 1
-            input_values.append(value)
+        # Ensure the feature is numeric before using it
+            if pd.api.types.is_numeric_dtype(data[feature]):
+                max_value = float(data[feature].max())  # Get the max value of the feature
+                min_value = 0  # Start from 0
+                value = st.slider(feature, min_value, int(max_value), (max_value) // 2, step=1)  # Step size of 1
+                input_values.append(value)
+            else:
+                st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
+                input_values.append(0) 
 
     # Display the prediction when the user presses the button
     st.markdown("""
