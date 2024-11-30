@@ -122,12 +122,14 @@ def run_streamlit_app():
 
     # Create sliders for each feature dynamically
     # Create sliders for each feature dynamically
-    for feature in feature_names:
+    # Create sliders for each feature dynamically
+input_values = []
+for feature in feature_names:
         if feature == "Research":  # Special handling for "Research" feature
             value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
             input_values.append(1 if value else 0)
         else:
-        # Ensure the feature is numeric before using it
+            # Ensure the feature is numeric before using it
             if pd.api.types.is_numeric_dtype(data[feature]):
                 try:
                     max_value = float(data[feature].max())  # Get the max value of the feature
@@ -143,37 +145,26 @@ def run_streamlit_app():
                     input_values.append(0)  # Add a default value in case of error
             else:
                 st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
-                input_values.append(0)   
+                input_values.append(0)  # Add a default value for non-numeric features
 
-    # Display the prediction when the user presses the button
-    st.markdown("""
-    <style>
-    .center-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-    }
-    </style>
-    <div class="center-button">
-        <button class="stButton" role="button">Predict Chance of Admit</button>
-    </div>
-""", unsafe_allow_html=True)
+# Display the input values for debugging purposes
+st.write("Input values:", input_values)
 
-# Display the prediction when the user presses the button
+# Ensure the input has the correct shape for prediction (2D array)
+input_array = np.array(input_values).reshape(1, -1)
+
+# Predict when the user presses the button
 if st.button("Predict Chance of Admit"):
-    prediction = predict_admission(input_values, model, scaler, feature_names)
-    prediction_value = np.clip(prediction * 100, 0, 100)
+    try:
+        prediction = predict_admission(input_array, model, scaler, feature_names)
+        # Display result with larger font if prediction is greater than 90
+        if prediction > 0.9:
+            st.markdown(f"<h2 style='text-align: center;'>The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%</h2>", unsafe_allow_html=True)
+        else:
+            st.write(f"The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%")
+    except Exception as e:
+        st.error(f"Prediction failed: {str(e)}")
 
-# Set font size based on prediction
-    font_size = "36px" if prediction_value > 90 else "18px"  # Larger font for predictions > 90%
-
-# Display the result with the custom font size
-    st.markdown(f"""
-        <h2 style='text-align: center; font-size: {font_size};'>
-        The predicted Chance of Admit is {prediction_value:.3f}%
-        </h2>
-    """, unsafe_allow_html=True)
 
 # Corrected the __name__ check
 if __name__ == "__main__":
