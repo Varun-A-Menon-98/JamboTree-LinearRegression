@@ -80,16 +80,6 @@ def predict_admission(input_values, model, scaler, feature_names):
 # Streamlit UI and Interaction
 def run_streamlit_app():
     # Load configuration to get the file path
-    # use ehen using local
-    # config = load_config()
-    # file_path = config.get('PATH')
-
-    # # Make sure the file path exists
-    # if not file_path or not os.path.exists(file_path):
-    #     st.error(f"File path '{file_path}' is invalid or missing.")
-    #     return
-
-    # use when URL
     config = load_config()
     file_path = config.get('PATH')
 
@@ -118,20 +108,25 @@ def run_streamlit_app():
     # Preprocess data and train the selected model
     model, scaler, feature_names = preprocess_and_train(data, model_type=model_type)
 
+    # Check if feature_names is populated
+    if not feature_names:
+        st.error("No features were found for training the model.")
+        return
+
+    # Log feature names for debugging purposes
+    st.write("Features used in the model:", feature_names)
+
     input_values = []
 
     # Create sliders for each feature dynamically
-    # Create sliders for each feature dynamically
-    # Create sliders for each feature dynamically
-input_values = []
-for feature in feature_names:
+    for feature in feature_names:
         if feature == "Research":  # Special handling for "Research" feature
             value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
             input_values.append(1 if value else 0)
         else:
-            # Ensure the feature is numeric before using it
-            if pd.api.types.is_numeric_dtype(data[feature]):
-                try:
+            try:
+                # Ensure the feature is numeric before using it
+                if pd.api.types.is_numeric_dtype(data[feature]):
                     max_value = float(data[feature].max())  # Get the max value of the feature
                     min_value = 0  # Start from 0
                     if max_value > 0:  # Check if the max value is positive
@@ -140,30 +135,32 @@ for feature in feature_names:
                     else:
                         st.warning(f"Feature '{feature}' has non-positive max value. Skipping slider.")
                         input_values.append(0)
-                except Exception as e:
-                    st.warning(f"Error creating slider for '{feature}': {e}")
-                    input_values.append(0)  # Add a default value in case of error
+                else:
+                    st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
+                    input_values.append(0)  # Add a default value for non-numeric features
+            except Exception as e:
+                st.warning(f"Error creating slider for '{feature}': {e}")
+                input_values.append(0)  # Add a default value in case of error
+
+    # Display the input values for debugging purposes
+    st.write("Input values:", input_values)
+
+    # Ensure the input has the correct shape for prediction (2D array)
+    input_array = np.array(input_values).reshape(1, -1)
+
+    # Predict when the user presses the button
+    if st.button("Predict Chance of Admit"):
+        try:
+            prediction = predict_admission(input_array, model, scaler, feature_names)
+            # Display result with larger font if prediction is greater than 90
+            if prediction > 0.9:
+                st.markdown(f"<h2 style='text-align: center;'>The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%</h2>", unsafe_allow_html=True)
             else:
-                st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
-                input_values.append(0)  # Add a default value for non-numeric features
+                st.write(f"The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%")
+        except Exception as e:
+            st.error(f"Prediction failed: {str(e)}")
 
-# Display the input values for debugging purposes
-st.write("Input values:", input_values)
 
-# Ensure the input has the correct shape for prediction (2D array)
-input_array = np.array(input_values).reshape(1, -1)
-
-# Predict when the user presses the button
-if st.button("Predict Chance of Admit"):
-    try:
-        prediction = predict_admission(input_array, model, scaler, feature_names)
-        # Display result with larger font if prediction is greater than 90
-        if prediction > 0.9:
-            st.markdown(f"<h2 style='text-align: center;'>The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%</h2>", unsafe_allow_html=True)
-        else:
-            st.write(f"The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%")
-    except Exception as e:
-        st.error(f"Prediction failed: {str(e)}")
 
 
 # Corrected the __name__ check
