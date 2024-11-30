@@ -108,21 +108,13 @@ def run_streamlit_app():
     # Preprocess data and train the selected model
     model, scaler, feature_names = preprocess_and_train(data, model_type=model_type)
 
-    # Check if feature_names is populated
-    if not feature_names:
-        st.error("No features were found for training the model.")
-        return
-
-    # Log feature names for debugging purposes
-    st.write("Features used in the model:", feature_names)
-
     input_values = []
 
-    # Create sliders for each feature dynamically
+    # Create input boxes for each feature dynamically
     for feature in feature_names:
-        if feature == "Research":  # Special handling for "Research" feature
-            value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
-            input_values.append(1 if value else 0)
+        if feature == "Research":  # Special handling for "Research" feature (toggle)
+            value = st.radio(feature, options=[0, 1], format_func=lambda x: f"Research: {x}")
+            input_values.append(value)  # Add either 0 or 1 based on the toggle
         else:
             try:
                 # Ensure the feature is numeric before using it
@@ -130,16 +122,18 @@ def run_streamlit_app():
                     max_value = float(data[feature].max())  # Get the max value of the feature
                     min_value = 0  # Start from 0
                     if max_value > 0:  # Check if the max value is positive
-                        value = st.slider(feature, min_value, int(max_value), (int(max_value)) // 2, step=1)  # Step size of 1
+                        value = st.number_input(
+                            feature, min_value=min_value, max_value=int(max_value), 
+                            value=(int(max_value) // 2), step=1)  # Step size of 1
                         input_values.append(value)
                     else:
-                        st.warning(f"Feature '{feature}' has non-positive max value. Skipping slider.")
+                        st.warning(f"Feature '{feature}' has non-positive max value. Skipping input box.")
                         input_values.append(0)
                 else:
-                    st.warning(f"Feature '{feature}' is not numeric. Skipping slider.")
+                    st.warning(f"Feature '{feature}' is not numeric. Skipping input box.")
                     input_values.append(0)  # Add a default value for non-numeric features
             except Exception as e:
-                st.warning(f"Error creating slider for '{feature}': {e}")
+                st.warning(f"Error creating input box for '{feature}': {e}")
                 input_values.append(0)  # Add a default value in case of error
 
     # Display the input values for debugging purposes
@@ -152,13 +146,18 @@ def run_streamlit_app():
     if st.button("Predict Chance of Admit"):
         try:
             prediction = predict_admission(input_array, model, scaler, feature_names)
-            # Display result with larger font if prediction is greater than 90
-            if prediction > 0.9:
-                st.markdown(f"<h2 style='text-align: center;'>The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%</h2>", unsafe_allow_html=True)
-            else:
-                st.write(f"The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%")
+            prediction_percent = np.clip(prediction * 100, 0, 100)
+            
+            # Display larger font and center text
+            st.markdown(f"<h2 style='text-align: center; font-size: 30px;'>The predicted Chance of Admit is {prediction_percent:.3f}%</h2>", unsafe_allow_html=True)
+            
+            # If prediction is greater than 90, show balloons
+            if prediction_percent > 90:
+                st.balloons()
+
         except Exception as e:
             st.error(f"Prediction failed: {str(e)}")
+
 
 
 
