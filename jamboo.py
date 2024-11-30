@@ -179,14 +179,6 @@ def run_streamlit_app():
     if 'prediction_result' in st.session_state:
         st.markdown(f"<h2 style='text-align: center; font-size: 30px;'>{st.session_state.prediction_result}</h2>", unsafe_allow_html=True)
 
-
-        except Exception as e:
-            st.error(f"Prediction failed: {str(e)}")
-
-
-
-
-
 # Corrected the __name__ check
 if __name__ == "__main__":
     run_streamlit_app()
