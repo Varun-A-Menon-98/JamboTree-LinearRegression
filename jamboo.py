@@ -79,12 +79,30 @@ def predict_admission(input_values, model, scaler, feature_names):
 # Streamlit UI and Interaction
 def run_streamlit_app():
     # Load configuration to get the file path
+    # use ehen using local
+    # config = load_config()
+    # file_path = config.get('PATH')
+
+    # # Make sure the file path exists
+    # if not file_path or not os.path.exists(file_path):
+    #     st.error(f"File path '{file_path}' is invalid or missing.")
+    #     return
+
+    # use when URL
     config = load_config()
     file_path = config.get('PATH')
 
-    # Make sure the file path exists
-    if not file_path or not os.path.exists(file_path):
-        st.error(f"File path '{file_path}' is invalid or missing.")
+    # Check if the file path is a valid URL
+    if not file_path:
+        st.error("File path is missing in the configuration.")
+        return
+
+    try:
+        # Check if the file URL is accessible
+        response = requests.get(file_path)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to access the file at {file_path}. Error: {e}")
         return
 
     # Load the data
