@@ -122,18 +122,43 @@ def run_streamlit_app():
 
     # Create sliders for each feature dynamically
     for feature in feature_names:
-    if feature == "Research":  # Special handling for "Research" feature
-        value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
-        input_values.append(1 if value else 0)
-    else:
-        max_value = float(data[feature].max())  # Get the max value of the feature
-        value = st.slider(feature, 0, int(max_value), (max_value) // 2, step=1)  # Step size of 1
-        input_values.append(value)
+        if feature == "Research":  # Special handling for "Research" feature
+            value = st.checkbox(feature, value=False)  # Checkbox (True = 1, False = 0)
+            input_values.append(1 if value else 0)
+        else:
+            max_value = float(data[feature].max())  # Get the max value of the feature
+            value = st.slider(feature, 0, int(max_value), (max_value) // 2, step=1)  # Step size of 1
+            input_values.append(value)
 
     # Display the prediction when the user presses the button
-    if st.button("Predict Chance of Admit"):
-        prediction = predict_admission(input_values, model, scaler, feature_names)
-        st.write(f"The predicted Chance of Admit is {np.clip(prediction * 100, 0, 100):.3f}%")
+    st.markdown("""
+    <style>
+    .center-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    </style>
+    <div class="center-button">
+        <button class="stButton" role="button">Predict Chance of Admit</button>
+    </div>
+""", unsafe_allow_html=True)
+
+# Display the prediction when the user presses the button
+if st.button("Predict Chance of Admit"):
+    prediction = predict_admission(input_values, model, scaler, feature_names)
+    prediction_value = np.clip(prediction * 100, 0, 100)
+
+# Set font size based on prediction
+    font_size = "36px" if prediction_value > 90 else "18px"  # Larger font for predictions > 90%
+
+# Display the result with the custom font size
+    st.markdown(f"""
+        <h2 style='text-align: center; font-size: {font_size};'>
+        The predicted Chance of Admit is {prediction_value:.3f}%
+        </h2>
+    """, unsafe_allow_html=True)
 
 # Corrected the __name__ check
 if __name__ == "__main__":
