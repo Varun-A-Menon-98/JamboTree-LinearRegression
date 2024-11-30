@@ -139,6 +139,14 @@ def run_streamlit_app():
                             value=int(max_value) // 2, step=1)  # Step size of 1 for other numeric features
                     
                     input_values.append(value)
+                else:
+                # For non-numeric features, you can handle them here or ignore
+                    st.warning(f"Feature '{feature}' is not numeric. Skipping input box.")
+                    input_values.append(0)  # Add a default value for non-numeric features
+            except Exception as e:
+            # Catch errors during the creation of the input box
+                st.warning(f"Error creating input box for '{feature}': {e}")
+                input_values.append(0) 
             #Add a default value in case of error
 
     # Display the input values for debugging purposes
