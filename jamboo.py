@@ -105,6 +105,15 @@ def run_streamlit_app():
     # Streamlit UI elements
     st.title("University Admission Prediction")
 
+    image_url = "https://media.licdn.com/dms/image/v2/D5612AQE1XxEXI1JDdQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1691710880639?e=2147483647&v=beta&t=SDtiydTUX3t-5LrHMgrVKZ-zVaddKaG3cSxRRDJhThc"
+
+# CSS to resize and center the image
+    st.markdown(f'''
+    <div style="text-align: center;">
+        <img src="{image_url}" style="width: 60%; height: auto;"/>
+    </div>
+    ''', unsafe_allow_html=True)
+
     # Dropdown to select model type (Ridge or Lasso)
     model_type = st.selectbox("Select the Model Type", ("Ridge", "Lasso"))
 
