@@ -6,6 +6,7 @@ import yaml  # Importing the yaml module
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge, Lasso
 import logging
+import requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
