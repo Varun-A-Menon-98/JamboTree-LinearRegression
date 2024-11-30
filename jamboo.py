@@ -113,7 +113,7 @@ def run_streamlit_app():
     # Create input boxes for each feature dynamically
     for feature in feature_names:
         if feature == "Research":  # Special handling for "Research" feature (toggle)
-            value = st.radio(feature, options=[0, 1], format_func=lambda x: f"Research: {x}")
+            value = st.toggle(feature)
             input_values.append(value)  # Add either 0 or 1 based on the toggle
         else:
             try:
@@ -137,7 +137,7 @@ def run_streamlit_app():
                 input_values.append(0)  # Add a default value in case of error
 
     # Display the input values for debugging purposes
-    st.write("Input values:", input_values)
+    # st.write("Input values:", input_values)
 
     # Ensure the input has the correct shape for prediction (2D array)
     input_array = np.array(input_values).reshape(1, -1)
